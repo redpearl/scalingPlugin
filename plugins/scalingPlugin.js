@@ -1,6 +1,6 @@
 // lib.plugins.scalingPlugin
 ig.module('plugins.scalingPlugin')
-    .requires('impact.image', 'impact.animation')
+    .requires('impact.image', 'impact.animation', 'impact.entity')
     .defines(
     function()
     {
@@ -60,13 +60,13 @@ ig.module('plugins.scalingPlugin')
         }/*,
         */
     }),
-	ig.Animation.inject({draw:function(targetX, targetY)
+	ig.Animation.inject({scale:{x: 1, y: 1}, draw:function(targetX, targetY)
         {
-            if(!this.scaleX){
-				this.scaleX = 1;
+            if(!this.scale.x){
+				this.scale.x = 1;
 			}
-			if(!this.scaleY){
-				this.scaleY = 1;
+			if(!this.scale.y){
+				this.scale.y = 1;
 			}
 			var bbsize = Math.max(this.sheet.width, this.sheet.height);
 			
@@ -87,7 +87,7 @@ ig.module('plugins.scalingPlugin')
 					targetX, targetY,
 					this.tile, this.sheet.width, this.sheet.height,
 					this.flip.x, this.flip.y,
-					this.scaleX, this.scaleY
+					this.scale.x, this.scale.y
 				);
 			}
 			else {
@@ -101,13 +101,25 @@ ig.module('plugins.scalingPlugin')
 					-this.pivot.x, -this.pivot.y,
 					this.tile, this.sheet.width, this.sheet.height,
 					this.flip.x, this.flip.y,
-					this.scaleX, this.scaleY
+					this.scale.x, this.scale.y
 				);
 				ig.system.context.restore();
 			}
 			
 			if( this.alpha != 1) {
 				ig.system.context.globalAlpha = 1;
+			}
+		}
+    }),
+	ig.Entity.inject({scale:{x: 1, y: 1}, draw:function()
+        {
+	        if( this.currentAnim ) {
+	        	this.currentAnim.scale.x = this.scale.x;
+        		this.currentAnim.scale.y = this.scale.y;
+				this.currentAnim.draw(
+					this.pos.x - this.offset.x - ig.game._rscreen.x,
+					this.pos.y - this.offset.y - ig.game._rscreen.y
+				);
 			}
 		}
     });
